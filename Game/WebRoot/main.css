@@ -83,8 +83,6 @@ ul.naked {
 
 ul#msglist li {
     overflow: hidden;
-    display: inline-block;
-    max-height: 1.2em;
 }
 
 .currentPlayer {
