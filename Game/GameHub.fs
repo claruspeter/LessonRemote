@@ -2,29 +2,38 @@ module Game.Hubs
 
 open System.Threading.Tasks
 open Microsoft.AspNetCore.SignalR
-open Microsoft.AspNetCore.Authorization
 
 
 type IGameHubCommands =
-    abstract member NavigateTo: string -> Task
+    abstract member JoinClass: string -> Task
+    abstract member NavigateTo: string -> string -> Task
     abstract member Refresh: unit -> Task
 
 type IGameHub = 
     inherit IGameHubCommands
     abstract member Navigated: string -> string -> Task
+    abstract member ReceivedMessage: string -> string -> Task
 
-[<Authorize>]
 type GameHub() =
     inherit Hub<IGameHub>()
     
     interface IGameHubCommands with 
-        member this.NavigateTo s = this.NavigateTo s
+        member this.JoinClass name = this.JoinClass name
+        member this.NavigateTo g s = this.NavigateTo g s
         member this.Refresh() = this.Refresh()
 
-    member this.NavigateTo (location: string) : Task =
+    member this.JoinClass (name: string) : Task =
+        async{
+            printfn "nav: (%s) joined %A" this.UserName name
+            return! this.Groups.AddToGroupAsync(this.Context.ConnectionId, name) |> Async.AwaitTask
+            return! this.Clients.Group(name).ReceivedMessage name (sprintf "Welcome %s" this.UserName) |> Async.AwaitTask
+        }
+        |> Async.StartAsTask :> _
+
+    member this.NavigateTo (groupName: string) (location: string) : Task =
         async{
             printfn "nav: (%s) %A" this.UserName location
-            return! this.Clients.Others.Navigated this.UserName location |> Async.AwaitTask
+            return! this.Clients.OthersInGroup(groupName).Navigated this.UserName location |> Async.AwaitTask
         }
         |> Async.StartAsTask :> _
 
@@ -36,5 +45,5 @@ type GameHub() =
         |> Async.StartAsTask :> _
 
     member private this.UserName : string  =
-        this.Context.User.Identity.Name
+        this.Context.ConnectionId
 

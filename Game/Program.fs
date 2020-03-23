@@ -26,26 +26,12 @@ let errorHandler (ex : Exception) (logger : ILogger) =
 let configureCors (builder : CorsPolicyBuilder) =
     builder
         .WithOrigins("http://localhost:8080")
-        .WithOrigins("http://localhost:5000")
-        .WithOrigins("https://localhost:5001")
         .AllowAnyMethod()
         .AllowAnyHeader()
-        .AllowCredentials()
         |> ignore
 
 let configureServices (services : IServiceCollection) =
     services.AddCors()    |> ignore
-    services.AddAuthentication(fun options ->
-                options.DefaultAuthenticateScheme <- CookieAuthenticationDefaults.AuthenticationScheme
-                options.DefaultSignInScheme <- CookieAuthenticationDefaults.AuthenticationScheme
-                options.DefaultChallengeScheme <- "Google"
-            )
-            .AddCookie()
-            .AddGoogle(fun options -> 
-                options.ClientId <- System.Environment.GetEnvironmentVariable("GOOGLE_CLIENT_ID")
-                options.ClientSecret <- System.Environment.GetEnvironmentVariable("GOOGLE_CLIENT_SECRET")
-            )
-            |> ignore
     services.AddGiraffe() |> ignore
     services.AddSignalR() |> ignore
 
@@ -56,16 +42,16 @@ let configureLogging (builder : ILoggingBuilder) =
 
 let configureApp (app : IApplicationBuilder) =
     let env = app.ApplicationServices.GetService<IHostingEnvironment>()
-    match env.IsDevelopment() with
-        | true  -> app.UseDeveloperExceptionPage() |> ignore
-        | false -> 
-            app.UseGiraffeErrorHandler(errorHandler)
-                .UseCors(configureCors)
-                .UseHttpsRedirection()
-                .UseStaticFiles()
-                .UseAuthentication()
-                .UseSignalR(fun routes -> routes.MapHub<Game.Hubs.GameHub>(PathString "/gamehub"))
-                .UseGiraffe(Game.App.app)
+    let builderWithErrorHandler =
+        match env.IsDevelopment() with
+        | true  -> app.UseDeveloperExceptionPage()
+        | false -> app.UseGiraffeErrorHandler errorHandler
+    builderWithErrorHandler
+        .UseHttpsRedirection()
+        .UseCors(configureCors)
+        .UseStaticFiles()
+        .UseSignalR(fun routes -> routes.MapHub<Game.Hubs.GameHub>(PathString "/gamehub"))
+        .UseGiraffe(Game.App.app)
     
 
 [<EntryPoint>]

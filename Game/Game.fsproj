@@ -10,7 +10,6 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" />
-    <PackageReference Include="Microsoft.AspNetCore.Authorization"/>
     <PackageReference Include="Microsoft.AspNetCore.SignalR"/>
     <PackageReference Include="Giraffe"/>
     <PackageReference Include="TaskBuilder.fs" Version="2.1.*" />

@@ -64,6 +64,13 @@ module Views =
                     pageHead username
                     div [ _class "container" ] [
                         main[ _role "main"; _class "pb-3"] content
+                        form [ _class "hijackJoin"][
+                            p [] [
+                                label [][ encodedText "Join Class"]
+                                input [ _name "name"; ]
+                                input [ _type "submit"; _value "Join"]
+                            ]
+                        ]                        
                         div [  ][ ul [ _id "msglist"; _class "naked"][] ]
                     ]
                 ]
@@ -114,25 +121,14 @@ module Views =
         [
             div [ _class "col-sm-9"; _id "app" ] [
                 p [] [ encodedText "This is a remote controller for a lesson.  It will open lesson pages in another tab - please allow 'Pop-ups' from this window."]
+
             ]
         ] |> layout username
 
-    let signedOut = 
-        [
-            div [ _style "flex-direction: column"][
-                h1 [ _class "jumbo"] [ encodedText "You have been signed out"]
-                p [ _class "jumbo"][ a [ _href "/" ] [ encodedText "Sign back in"]]
-            ]
-        ]
-        |> layout "Signed Out"
-        |> htmlView
 
 // ---------------------------------
 // Web app
 // ---------------------------------
-
-let mustBeLoggedIn : HttpHandler = 
-    requiresAuthentication (challenge "Google")
 
 let indexHandler  =
     fun (next : HttpFunc) (ctx : Microsoft.AspNetCore.Http.HttpContext) ->
@@ -148,8 +144,7 @@ let app : HttpHandler =
     choose [
         GET >=>
             choose [
-                route "/" >=> mustBeLoggedIn >=> indexHandler
-                route "/controller" >=> mustBeLoggedIn >=> controllerHandler
-                route "/signout" >=> signOut "Cookies" >=> Views.signedOut
+                route "/" >=> indexHandler
+                route "/controller" >=> controllerHandler
             ]
         setStatusCode 404 >=> text "Not Found" ]
