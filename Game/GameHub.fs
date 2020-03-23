@@ -24,7 +24,7 @@ type GameHub() =
 
     member this.JoinClass (name: string) : Task =
         async{
-            printfn "nav: (%s) joined %A" this.UserName name
+            printfn "%s joined %A" this.UserName name
             return! this.Groups.AddToGroupAsync(this.Context.ConnectionId, name) |> Async.AwaitTask
             return! this.Clients.Group(name).ReceivedMessage name (sprintf "Welcome %s" this.UserName) |> Async.AwaitTask
         }
@@ -32,7 +32,7 @@ type GameHub() =
 
     member this.NavigateTo (groupName: string) (location: string) : Task =
         async{
-            printfn "nav: (%s) %A" this.UserName location
+            printfn "nav: %s -> %A" this.UserName location
             return! this.Clients.OthersInGroup(groupName).Navigated this.UserName location |> Async.AwaitTask
         }
         |> Async.StartAsTask :> _
