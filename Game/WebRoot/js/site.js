@@ -25,6 +25,14 @@ $('.hijackJoin').submit(function(ev) {
     return false;
 });
 
+$('.hijackCreate').submit(function(ev) {
+    ev.preventDefault();
+    const data = objectifyForm(this);
+    CreateClass(data.name);
+    this.reset();
+    return false;
+});
+
 $('.hijackLink').click(function(ev){
   ev.preventDefault();
   NavigateTo($(this).attr('href'));

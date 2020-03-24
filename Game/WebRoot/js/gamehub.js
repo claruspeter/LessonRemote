@@ -24,11 +24,15 @@ connection.start().then(function () {
     return console.error(err.toString());
 });
 
+function CreateClass(name) {
+    connection.invoke("CreateClass", name).catch(function (err) {
+        return console.error(err.toString());
+    });
+}
+
 function JoinClass(name) {
     connection.invoke("JoinClass", name).catch(function (err) {
         return console.error(err.toString());
-    }).then( function() {
-        myClass = name;
     });
 }
 
@@ -42,6 +46,11 @@ function NavigateTo(location) {
             return console.error(err.toString());
         });
 }
+
+connection.on("ClassJoined", function (className) {
+    myClass = className;
+    $('#joinMsg').html(`You have joined class ${className}.`);
+});
 
 connection.on("ReceivedMessage", function (className, msg) {
     logMessage( className, msg);

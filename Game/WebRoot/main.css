@@ -95,3 +95,6 @@ ul#msglist li {
 #game-controls a {
     padding: 0.5em;
 }
+label {
+    margin-right: 1em;
+}

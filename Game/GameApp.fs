@@ -64,13 +64,6 @@ module Views =
                     pageHead username
                     div [ _class "container" ] [
                         main[ _role "main"; _class "pb-3"] content
-                        form [ _class "hijackJoin"][
-                            p [] [
-                                label [][ encodedText "Join Class"]
-                                input [ _name "name"; ]
-                                input [ _type "submit"; _value "Join"]
-                            ]
-                        ]                        
                         div [  ][ ul [ _id "msglist"; _class "naked"][] ]
                     ]
                 ]
@@ -114,6 +107,14 @@ module Views =
                         )
                     )
                 )
+                form [ _class "hijackCreate"][
+                    p [] [
+                        label [][ encodedText "Class Name"]
+                        input [ _name "name"; ]
+                        input [ _type "submit"; _value "Create"]
+                    ]
+                ]       
+                p [ _id "joinMsg"] []                  
             ]
         ] |> layout username
 
@@ -121,7 +122,14 @@ module Views =
         [
             div [ _class "col-sm-9"; _id "app" ] [
                 p [] [ encodedText "This is a remote controller for a lesson.  It will open lesson pages in another tab - please allow 'Pop-ups' from this window."]
-
+                form [ _class "hijackJoin"][
+                    p [] [
+                        label [][ encodedText "Class Name"]
+                        input [ _name "name"; ]
+                        input [ _type "submit"; _value "Join"]
+                    ]
+                ]       
+                p [ _id "joinMsg"] []  
             ]
         ] |> layout username
 
